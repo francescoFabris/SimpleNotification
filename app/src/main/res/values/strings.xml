@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SimpleNotification</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
+    <string name="insert_date">DD/MM/YY</string>
+    <string name="insert_time">HH:MM</string>
+    <string name="insert_note">NOTIFY NOTE</string>
+
+</resources>
