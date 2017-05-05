@@ -1,30 +1,36 @@
 package esp1617.dei.unipd.it.simplenotification;
 
+import android.app.AlarmManager;
 import android.app.Notification.Builder;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.icu.util.Calendar;
+import android.os.Parcelable;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private int hour;
     private int min;
     private int day;
     private int month;
     private int year;
 
-    private Notification.Builder notBuilder;
-    private static final int NOTIFICATION_ID =1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,27 +119,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        notBuilder=new Notification.Builder(this);
-        notBuilder
-                .setAutoCancel(true)
-                .setTicker("Ticker")
-                .setSmallIcon(R.mipmap.ic_launcher);
-
-
-
         bu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick called", new Exception());
                 String nota = et.getText().toString();
                 Calendar cal = Calendar.getInstance();
                 cal.set(year, month, day, hour, min);
-                notBuilder
-                        .setWhen(cal.getTimeInMillis())
-                        .setContentTitle("ContentTitle")
-                        .setContentText("ContentText");
+                long time = cal.getTimeInMillis();
 
-                NotificationManager notManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-                notManager.notify(1,notBuilder.build());
+                scheduleNotification(createNotification(nota), SystemClock.elapsedRealtime()+5000);
 
 
                 et.setText("");
@@ -142,10 +137,32 @@ public class MainActivity extends AppCompatActivity {
                 spinner_day.setSelection(0);
                 spinner_month.setSelection(0);
                 spinner_year.setSelection(0);
+                Toast.makeText(MainActivity.this, "Notification Scheduled",Toast.LENGTH_SHORT).show();
             }
         });
 
+
     }
 
+    private void scheduleNotification(Notification notification, long when){
+
+        Log.d(TAG, "scheduleNotification called", new Exception());
+        Intent notificationIntent = new Intent(this, Reciever.class);
+        notificationIntent.putExtra(Reciever.NOTIFICATION_ID, 1);
+        notificationIntent.putExtra(Reciever.NOTIFICATION, notification);
+        PendingIntent pInt = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alMan = (AlarmManager)getSystemService(Context.ALARM_SERVICE); // alMan è un AlarmManager
+        alMan.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, when, pInt);                // alBan è un Cantante
+    }
+
+    private Notification createNotification(String nota){
+        Log.d(TAG, "createNotification called", new Exception());
+        Notification.Builder nBuilder = new Notification.Builder(this);
+        nBuilder.setContentTitle("ContentTitle");
+        nBuilder.setContentText(nota);
+        nBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        return nBuilder.build();
+    }
 
 }
