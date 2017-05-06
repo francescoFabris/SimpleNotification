@@ -22,6 +22,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -109,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         spinner_year.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                year = 1 + position;
+                year = 2017 + position;
             }
 
             @Override
@@ -124,11 +126,27 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d(TAG, "onClick called", new Exception());
                 String nota = et.getText().toString();
-                Calendar cal = Calendar.getInstance();
-                cal.set(year, month, day, hour, min);
-                long time = cal.getTimeInMillis();
+                Calendar cal = Calendar.getInstance(); //istanza di Calendar
+                cal.set(year, month, day, hour, min);  //impostazione data predefinita
+                //long time = cal.getTimeInMillis();
+                Date now = Calendar.getInstance().getTime();
+                Date date = cal.getTime();
+                long delta = date.getTime()-now.getTime();
 
-                scheduleNotification(createNotification(nota), SystemClock.elapsedRealtime()+5000);
+                Log.d(TAG, day+"/"+month+"/"+year+"   "+hour+":"+min, new Exception());
+                Log.d(TAG, "now.getTime()="+now.getTime(), new Exception());
+                Log.d(TAG, "date.getTime()="+date.getTime(), new Exception());
+                Log.d(TAG, "SystemClock.elapsedRealtime()="+SystemClock.elapsedRealtime(), new Exception());
+                Log.d(TAG, "delta="+delta, new Exception());
+                if(delta<0){
+                    Toast.makeText(MainActivity.this, "You cannot be notified in the past",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    scheduleNotification(createNotification(nota), SystemClock.elapsedRealtime()+delta);
+                    //scheduleNotification(createNotification(nota), date.getTime());
+                    Toast.makeText(MainActivity.this, "Notification Scheduled",Toast.LENGTH_SHORT).show();
+                }
+
 
 
                 et.setText("");
@@ -137,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 spinner_day.setSelection(0);
                 spinner_month.setSelection(0);
                 spinner_year.setSelection(0);
-                Toast.makeText(MainActivity.this, "Notification Scheduled",Toast.LENGTH_SHORT).show();
+
             }
         });
 
