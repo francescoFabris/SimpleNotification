@@ -6,5 +6,10 @@
     <string name="insert_time">HH:MM</string>
     <string name="insert_note">NOTIFY NOTE</string>
     <string name="set_notify">SET NOTIFICATION</string>
+    <string name="not_title">There\'s something you should remember</string>
+    <string name="success">Notification Scheduled</string>
+    <string name="unsuccess">You cannot be notified in the past</string>
+
+
 
 </resources>

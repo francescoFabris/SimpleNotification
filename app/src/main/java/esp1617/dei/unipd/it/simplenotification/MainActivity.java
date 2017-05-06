@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.icu.util.Calendar;
+import android.icu.util.GregorianCalendar;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         spinner_min.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                min = position + 1;
+                min = position;
             }
 
             @Override
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         spinner_day.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                day = position + 1;
+                day = position+1;
             }
 
             @Override
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         spinner_month.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                month = position + 1;
+                month = position;
             }
 
             @Override
@@ -139,12 +140,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "SystemClock.elapsedRealtime()="+SystemClock.elapsedRealtime(), new Exception());
                 Log.d(TAG, "delta="+delta, new Exception());
                 if(delta<0){
-                    Toast.makeText(MainActivity.this, "You cannot be notified in the past",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.unsuccess,Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    scheduleNotification(createNotification(nota), SystemClock.elapsedRealtime()+delta);
+                    //scheduleNotification(createNotification(nota), SystemClock.elapsedRealtime()+delta);
+                    scheduleNotification(createNotification(nota), date.getTime());
                     //scheduleNotification(createNotification(nota), date.getTime());
-                    Toast.makeText(MainActivity.this, "Notification Scheduled",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.success,Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -171,13 +173,14 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pInt = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alMan = (AlarmManager)getSystemService(Context.ALARM_SERVICE); // alMan è un AlarmManager
-        alMan.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, when, pInt);                // alBan è un Cantante
+        //alMan.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, when, pInt);                // alBan è un Cantante
+        alMan.set(AlarmManager.RTC_WAKEUP, when, pInt);
     }
 
     private Notification createNotification(String nota){
         Log.d(TAG, "createNotification called", new Exception());
         Notification.Builder nBuilder = new Notification.Builder(this);
-        nBuilder.setContentTitle("ContentTitle");
+        nBuilder.setContentTitle(getResources().getString(R.string.not_title));
         nBuilder.setContentText(nota);
         nBuilder.setSmallIcon(R.mipmap.ic_launcher);
         return nBuilder.build();
