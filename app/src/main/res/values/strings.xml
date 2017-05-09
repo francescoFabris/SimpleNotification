@@ -9,7 +9,8 @@
     <string name="not_title">There\'s something you should remember</string>
     <string name="success">Notification Scheduled</string>
     <string name="unsuccess">You cannot be notified in the past</string>
-
+    <string name="input_date">Input Date</string>
+    <string name="input_time">Input Time</string>
 
 
 </resources>
