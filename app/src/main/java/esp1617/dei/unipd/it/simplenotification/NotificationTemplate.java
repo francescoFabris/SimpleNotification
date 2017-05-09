@@ -6,7 +6,7 @@ import java.util.Calendar;
  * Created by boemd on 09/05/2017.
  */
 
-public class NotificationTemplate {
+class NotificationTemplate {
     private int id;
     private Calendar when;
     private String text;
@@ -17,8 +17,8 @@ public class NotificationTemplate {
     }
 
     //i metodi setter non sono necessari
-    public int getId(){return id;}
-    public Calendar getWhen(){return when;}
-    public String getText(){return text;}
+    int getId(){return id;}
+    Calendar getWhen(){return when;}
+    String getText(){return text;}
 
 }

@@ -2,26 +2,22 @@ package esp1617.dei.unipd.it.simplenotification;
 
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.Notification.Builder;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.BitmapFactory;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -80,13 +76,12 @@ public class MainActivity extends AppCompatActivity {
                 int id = preferences.getInt("id",0);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putInt("id", ++id);
-                editor.commit();
+                editor.apply();
 
                 Log.d(TAG, "onClick called", new Exception());
                 String nota = et.getText().toString();
                 Calendar cal = Calendar.getInstance(); //istanza di Calendar
-                cal.set(mYear, mMonth, mDay, hour, min);  //impostazione data predefinita
-                //long time = cal.getTimeInMillis();
+                cal.set(mYear, mMonth, mDay, hour, min);  //impostazione data definita
                 Date now = Calendar.getInstance().getTime();
                 Date date = cal.getTime();
                 long delta = date.getTime()-now.getTime();
@@ -110,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                 et.setText("");
-                mDate.setText("Input Date");
-                mHour.setText("Input Time");
+                mDate.setText(R.string.input_date);
+                mHour.setText(R.string.input_time);
             }
         });
 
@@ -122,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         (new DatePickerDialog(MainActivity.this, dateSetListener, year, month, dayOfMonth)).show();
     }
 
-    private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+    private final DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
             mYear = year;
             mMonth = month;
@@ -132,11 +127,11 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void showTimeDialog(int hour, int min) {
+    private void showTimeDialog(int hour, int min) {
         (new TimePickerDialog(MainActivity.this, timeSetListenerS, hour, min, true)).show();
     }
 
-    private TimePickerDialog.OnTimeSetListener timeSetListenerS = new TimePickerDialog.OnTimeSetListener() {
+    private final TimePickerDialog.OnTimeSetListener timeSetListenerS = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute)
         {
@@ -161,13 +156,13 @@ public class MainActivity extends AppCompatActivity {
         alMan.set(AlarmManager.RTC_WAKEUP, nt.getWhen().getTime().getTime(), pInt);
     }
 
-    public Notification createNotification(Context context, NotificationTemplate nt){
+    private Notification createNotification(Context context, NotificationTemplate nt){
         NotificationCompat.Builder builder = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
                 .setContentTitle(getResources().getString(R.string.not_title))
                 .setContentText(nt.getText())
                 .setAutoCancel(true)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(((BitmapDrawable) context.getResources().getDrawable(R.mipmap.ic_launcher)).getBitmap());
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
 
         return builder.build();
     }

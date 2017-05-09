@@ -12,8 +12,8 @@ import android.content.Intent;
 
 public class Receiver extends BroadcastReceiver{
 
-    public static String NOTIFICATION_ID ="notification_id";
-    public static String NOTIFICATION = "notification";
+    public static final String NOTIFICATION_ID ="notification_id";
+    public static final String NOTIFICATION = "notification";
 
     public void onReceive(Context context, Intent intent) {
         NotificationManager nMan = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
