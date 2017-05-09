@@ -1,8 +1,11 @@
 package esp1617.dei.unipd.it.simplenotification;
 
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.Notification.Builder;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,8 +19,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.Date;
@@ -26,11 +32,11 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private int hour;
-    private int min;
-    private int day;
-    private int month;
-    private int year;
+    private int hour=-1;
+    private int min=-1;
+    private int mDay;
+    private int mMonth;
+    private int mYear;
 
 
     @Override
@@ -39,83 +45,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final EditText et = (EditText) findViewById(R.id.note_space);
         Button bu = (Button) findViewById(R.id.set_notification);
-        final Spinner spinner_hour = (Spinner) findViewById(R.id.hour_spinner);
-        final Spinner spinner_min = (Spinner) findViewById(R.id.minutes_spinner);
-        final Spinner spinner_day = (Spinner) findViewById(R.id.day_spinner);
-        final Spinner spinner_month = (Spinner) findViewById(R.id.month_spinner);
-        final Spinner spinner_year = (Spinner) findViewById(R.id.year_spinner);
+        final TextView mDate =(TextView) findViewById(R.id.date_text);
+        final TextView mHour =(TextView) findViewById(R.id.hour_text);
 
-        ArrayAdapter<CharSequence> hour_adapter = ArrayAdapter.createFromResource(this, R.array.hour_array, android.R.layout.simple_spinner_item);
-        hour_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_hour.setAdapter(hour_adapter);
-        spinner_hour.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                hour = position;
-            }
+        mDate.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                //current date
+                final java.util.Calendar c = java.util.Calendar.getInstance();
+                mDay = c.get(java.util.Calendar.DAY_OF_MONTH);
+                mMonth = c.get(java.util.Calendar.MONTH);
+                mYear = c.get(java.util.Calendar.YEAR);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+                showDateDialog(mYear, mMonth, mDay);
             }
         });
 
-        ArrayAdapter<CharSequence> min_adapter = ArrayAdapter.createFromResource(this, R.array.minutes_array, android.R.layout.simple_spinner_item);
-        min_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_min.setAdapter(min_adapter);
-        spinner_min.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                min = position;
-            }
+        mHour.setOnClickListener(new EditText.OnClickListener() {
+            public void onClick(View v) {
+                if (hour == -1 || min == -1) {
+                    java.util.Calendar c = java.util.Calendar.getInstance();
+                    hour = c.get(java.util.Calendar.HOUR);
+                    min = c.get(java.util.Calendar.MINUTE);
+                }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        ArrayAdapter<CharSequence> day_adapter = ArrayAdapter.createFromResource(this, R.array.day_array, android.R.layout.simple_spinner_item);
-        day_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_day.setAdapter(day_adapter);
-        spinner_day.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                day = position+1;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        ArrayAdapter<CharSequence> month_adapter = ArrayAdapter.createFromResource(this, R.array.month_array, android.R.layout.simple_spinner_item);
-        month_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_month.setAdapter(month_adapter);
-        spinner_month.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                month = position;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        ArrayAdapter<CharSequence> year_adapter = ArrayAdapter.createFromResource(this, R.array.years_array, android.R.layout.simple_spinner_item);
-        year_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_year.setAdapter(year_adapter);
-        spinner_year.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                year = 2017 + position;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+                showTimeDialog(hour, min);
             }
         });
 
@@ -132,13 +85,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onClick called", new Exception());
                 String nota = et.getText().toString();
                 Calendar cal = Calendar.getInstance(); //istanza di Calendar
-                cal.set(year, month, day, hour, min);  //impostazione data predefinita
+                cal.set(mYear, mMonth, mDay, hour, min);  //impostazione data predefinita
                 //long time = cal.getTimeInMillis();
                 Date now = Calendar.getInstance().getTime();
                 Date date = cal.getTime();
                 long delta = date.getTime()-now.getTime();
 
-                Log.d(TAG, day+"/"+month+"/"+year+"   "+hour+":"+min, new Exception());
+                Log.d(TAG, mDay+"/"+mMonth+"/"+mYear+"   "+hour+":"+min, new Exception());
                 Log.d(TAG, "now.getTime()="+now.getTime(), new Exception());
                 Log.d(TAG, "date.getTime()="+date.getTime(), new Exception());
                 Log.d(TAG, "SystemClock.elapsedRealtime()="+SystemClock.elapsedRealtime(), new Exception());
@@ -157,17 +110,43 @@ public class MainActivity extends AppCompatActivity {
 
 
                 et.setText("");
-                spinner_hour.setSelection(0);
-                spinner_min.setSelection(0);
-                spinner_day.setSelection(0);
-                spinner_month.setSelection(0);
-                spinner_year.setSelection(0);
-
+                mDate.setText("Input Date");
+                mHour.setText("Input Time");
             }
         });
 
 
     }
+
+    private void showDateDialog(int year, int month, int dayOfMonth){
+        (new DatePickerDialog(MainActivity.this, dateSetListener, year, month, dayOfMonth)).show();
+    }
+
+    private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+            mYear = year;
+            mMonth = month;
+            mDay = dayOfMonth;
+            TextView mDate = (TextView) findViewById(R.id.date_text);
+            mDate.setText(new StringBuilder().append(mDay).append("/").append(mMonth+1).append("/").append(mYear));
+        }
+    };
+
+    public void showTimeDialog(int hour, int min) {
+        (new TimePickerDialog(MainActivity.this, timeSetListenerS, hour, min, true)).show();
+    }
+
+    private TimePickerDialog.OnTimeSetListener timeSetListenerS = new TimePickerDialog.OnTimeSetListener() {
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute)
+        {
+            hour = hourOfDay;
+            min = minute;
+            TextView spaceSleep = (TextView) findViewById(R.id.hour_text);
+            spaceSleep.setText(hour + " : " + min);
+
+        }
+    };
 
     private void scheduleNotification(Notification n, NotificationTemplate nt){
 
