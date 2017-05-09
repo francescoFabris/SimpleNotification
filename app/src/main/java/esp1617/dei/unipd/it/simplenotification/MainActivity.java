@@ -1,15 +1,12 @@
 package esp1617.dei.unipd.it.simplenotification;
 
 import android.app.AlarmManager;
-import android.app.Notification.Builder;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
-import android.os.Parcelable;
+import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.Date;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -125,6 +123,12 @@ public class MainActivity extends AppCompatActivity {
         bu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+                int id = preferences.getInt("id",0);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putInt("id", ++id);
+                editor.commit();
+
                 Log.d(TAG, "onClick called", new Exception());
                 String nota = et.getText().toString();
                 Calendar cal = Calendar.getInstance(); //istanza di Calendar
@@ -139,13 +143,14 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "date.getTime()="+date.getTime(), new Exception());
                 Log.d(TAG, "SystemClock.elapsedRealtime()="+SystemClock.elapsedRealtime(), new Exception());
                 Log.d(TAG, "delta="+delta, new Exception());
+
+                NotificationTemplate nt = new NotificationTemplate(id, cal, nota);
                 if(delta<0){
                     Toast.makeText(MainActivity.this, R.string.unsuccess,Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    //scheduleNotification(createNotification(nota), SystemClock.elapsedRealtime()+delta);
-                    scheduleNotification(createNotification(nota), date.getTime());
-                    //scheduleNotification(createNotification(nota), date.getTime());
+                    scheduleNotification(createNotification(MainActivity.this,nt), nt);
+                    Log.d(TAG, "Creata notifica con id "+nt.getId(), new Exception());
                     Toast.makeText(MainActivity.this, R.string.success,Toast.LENGTH_SHORT).show();
                 }
 
@@ -164,26 +169,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void scheduleNotification(Notification notification, long when){
+    private void scheduleNotification(Notification n, NotificationTemplate nt){
 
         Log.d(TAG, "scheduleNotification called", new Exception());
-        Intent notificationIntent = new Intent(this, Reciever.class);
-        notificationIntent.putExtra(Reciever.NOTIFICATION_ID, 1);
-        notificationIntent.putExtra(Reciever.NOTIFICATION, notification);
-        PendingIntent pInt = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent notificationIntent = new Intent(this, Receiver.class);
+        notificationIntent.putExtra(Receiver.NOTIFICATION, n);
+        notificationIntent.putExtra(Receiver.NOTIFICATION_ID, nt.getId());
+        PendingIntent pInt = PendingIntent.getBroadcast(this, nt.getId(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alMan = (AlarmManager)getSystemService(Context.ALARM_SERVICE); // alMan è un AlarmManager
         //alMan.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, when, pInt);                // alBan è un Cantante
-        alMan.set(AlarmManager.RTC_WAKEUP, when, pInt);
+        alMan.set(AlarmManager.RTC_WAKEUP, nt.getWhen().getTime().getTime(), pInt);
     }
 
-    private Notification createNotification(String nota){
-        Log.d(TAG, "createNotification called", new Exception());
-        Notification.Builder nBuilder = new Notification.Builder(this);
-        nBuilder.setContentTitle(getResources().getString(R.string.not_title));
-        nBuilder.setContentText(nota);
-        nBuilder.setSmallIcon(R.mipmap.ic_launcher);
-        return nBuilder.build();
+    public Notification createNotification(Context context, NotificationTemplate nt){
+        NotificationCompat.Builder builder = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                .setContentTitle(getResources().getString(R.string.not_title))
+                .setContentText(nt.getText())
+                .setAutoCancel(true)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(((BitmapDrawable) context.getResources().getDrawable(R.mipmap.ic_launcher)).getBitmap());
+
+        return builder.build();
     }
 
 }

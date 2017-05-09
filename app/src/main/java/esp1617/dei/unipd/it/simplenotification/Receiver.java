@@ -10,7 +10,7 @@ import android.content.Intent;
  * Created by boemd on 05/05/2017.
  */
 
-public class Reciever extends BroadcastReceiver{
+public class Receiver extends BroadcastReceiver{
 
     public static String NOTIFICATION_ID ="notification_id";
     public static String NOTIFICATION = "notification";
@@ -20,6 +20,7 @@ public class Reciever extends BroadcastReceiver{
 
         Notification not = intent.getParcelableExtra(NOTIFICATION);
         int id = intent.getIntExtra(NOTIFICATION_ID, 0);
+
         nMan.notify(id, not);
     }
 }
