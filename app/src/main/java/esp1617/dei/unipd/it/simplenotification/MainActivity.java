@@ -57,10 +57,10 @@ public class MainActivity extends AppCompatActivity {
         mDate.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 //current date
-                final java.util.Calendar c = java.util.Calendar.getInstance();
-                mDay = c.get(java.util.Calendar.DAY_OF_MONTH);
-                mMonth = c.get(java.util.Calendar.MONTH);
-                mYear = c.get(java.util.Calendar.YEAR);
+                final Calendar c = Calendar.getInstance();
+                mDay = c.get(Calendar.DAY_OF_MONTH);
+                mMonth = c.get(Calendar.MONTH);
+                mYear = c.get(Calendar.YEAR);
 
                 showDateDialog(mYear, mMonth, mDay);
             }
@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
         mHour.setOnClickListener(new EditText.OnClickListener() {
             public void onClick(View v) {
                 if (hour == -1 || min == -1) {
-                    java.util.Calendar c = java.util.Calendar.getInstance();
-                    hour = c.get(java.util.Calendar.HOUR);
-                    min = c.get(java.util.Calendar.MINUTE);
+                    Calendar c = Calendar.getInstance();
+                    hour = c.get(Calendar.HOUR);
+                    min = c.get(Calendar.MINUTE);
                 }
 
                 showTimeDialog(hour, min);
@@ -150,8 +150,8 @@ public class MainActivity extends AppCompatActivity {
         {
             hour = hourOfDay;
             min = minute;
-            TextView spaceSleep = (TextView) findViewById(R.id.hour_text);
-            spaceSleep.setText(hour + " : " + min);
+            TextView mHour = (TextView) findViewById(R.id.hour_text);
+            mHour.setText(hour + " : " + min);
 
         }
     };
