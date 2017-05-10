@@ -21,6 +21,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import java.util.Date;
 import java.util.Calendar;
@@ -33,16 +36,23 @@ public class MainActivity extends AppCompatActivity {
     private int mDay;
     private int mMonth;
     private int mYear;
-
+    private int ShowcaseDelay = 1000;
+    private static final String SHOWCASE_ID = "01";
+    private EditText et;
+    private TextView mDate;
+    private TextView mHour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final EditText et = (EditText) findViewById(R.id.note_space);
+        et = (EditText) findViewById(R.id.note_space);
         Button bu = (Button) findViewById(R.id.set_notification);
-        final TextView mDate =(TextView) findViewById(R.id.date_text);
-        final TextView mHour =(TextView) findViewById(R.id.hour_text);
+        mDate =(TextView) findViewById(R.id.date_text);
+        mHour =(TextView) findViewById(R.id.hour_text);
+
+
+        presentShowcaseSequence();
 
         mDate.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
@@ -107,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
                 et.setText("");
                 mDate.setText(R.string.input_date);
                 mHour.setText(R.string.input_time);
+
+
+
             }
         });
 
@@ -166,5 +179,54 @@ public class MainActivity extends AppCompatActivity {
 
         return builder.build();
     }
+
+    private void presentShowcaseSequence() {
+
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500); // half second between each showcase view
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
+
+        sequence.setOnItemShownListener(new MaterialShowcaseSequence.OnSequenceItemShownListener() {
+            @Override
+            public void onShow(MaterialShowcaseView itemView, int position) {
+
+            }
+        });
+
+        sequence.setConfig(config);
+
+        sequence.addSequenceItem(
+                new MaterialShowcaseView.Builder(this)
+                        .setTarget(et)
+                        .setDismissText("GOT IT")
+                        .setContentText("Add a note to the notification")
+                        .withRectangleShape(true)
+                        .build()
+        );
+
+        sequence.addSequenceItem(
+                new MaterialShowcaseView.Builder(this)
+                        .setTarget(mDate)
+                        .setDismissText("GOT IT")
+                        .setContentText("Choose the date for the notification")
+                        .withRectangleShape()
+                        .build()
+        );
+
+        sequence.addSequenceItem(
+                new MaterialShowcaseView.Builder(this)
+                        .setTarget(mHour)
+                        .setDismissText("GOT IT")
+                        .setContentText("Choose the time for the notification")
+                        .withRectangleShape()
+                        .build()
+        );
+
+        sequence.start();
+
+    }
+
+
 
 }
